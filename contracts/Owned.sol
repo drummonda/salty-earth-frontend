@@ -10,7 +10,7 @@ contract Owned {
 	mapping (address => bool) public approved;
 
 	/* -------------- Constructor --------------*/
-	constructor() {
+	constructor() public {
 		owner = msg.sender;
 	}
 
