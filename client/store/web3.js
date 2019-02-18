@@ -63,14 +63,17 @@ export const initializeContract = (name, blob) => async dispatch => {
 
 export const initializeAccount = () => async dispatch => {
 	try {
-		// grab the accounts array from the current provider
-		const accounts = await web3.eth.getAccounts()
-		// set the current account
-		const account = accounts[0]
-		// grab the account balance and address
-		const balance = await web3.utils.fromWei(await web3.eth.getBalance(account))
-		// update our redux store
-		dispatch(setAccount(account, balance))
+		// only initialize the accounts if a web3 instance was found
+		if(web3) {
+			// grab the accounts array from the current provider
+			const accounts = await web3.eth.getAccounts()
+			// set the current account
+			const account = accounts[0]
+			// grab the account balance and address
+			const balance = await web3.utils.fromWei(await web3.eth.getBalance(account))
+			// update our redux store
+			dispatch(setAccount(account, balance))
+		}
 	} catch (err) {
 		console.error(err)
 	}
