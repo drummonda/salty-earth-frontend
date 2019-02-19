@@ -12,7 +12,7 @@ contract ERC20 {
 	/* -------------- Contract variables --------------*/
 	string public name;
 	string public symbol;
-	uint8 public decimals = 18;
+	uint8 public constant decimals = 18;
 	uint256 public totalSupply;
 
 	mapping (address => uint256) public balanceOf;
@@ -24,11 +24,11 @@ contract ERC20 {
 	event Burn(address indexed from, uint256 value);
 
 	/* -------------- Constructor function --------------*/
-	constructor (uint256 initialSupply, string memory tokenName, string memory tokenSymbol) public {
-		totalSupply = initialSupply * 10 * uint256(decimals);
-		balanceOf[msg.sender] = initialSupply;
+	constructor (string memory tokenName, string memory tokenSymbol) public {
 		name = tokenName;
 		symbol = tokenSymbol;
+        totalSupply = 1000 * 10 **uint(decimals);
+        balanceOf[msg.sender] = 100 * 10**uint(decimals);
 	}
 
 	/**
