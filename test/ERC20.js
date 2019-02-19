@@ -1,7 +1,7 @@
 const ERC20 = artifacts.require("ERC20");
-const BN = require('bn.js');
 const Web3 = require("web3");
-const web3 = new Web3("http://localhost:8080");
+const ganache = require("ganache-cli");
+const web3 = new Web3(ganache.provider());
 
 contract("ERC20", accounts => {
 
@@ -21,19 +21,19 @@ contract("ERC20", accounts => {
 	describe("Initial state", () => {
 		beforeEach(deploy);
 
-		it("totalSupply - starts with a total supply", async () => {
+		it("has variable totalSupply - starts with a total supply", async () => {
 			const totalSupply = await erc20.totalSupply.call();
 		 	assert.ok(totalSupply);
 		});
 
-		it("name, symbol - starts with a name and symbol", async () => {
+		it("has variables name, symbol - starts with a name and symbol", async () => {
 			const name = await erc20.name.call();
 			const symbol = await erc20.symbol.call();
 			assert.equal(name, "SlotToken");
 			assert.equal(symbol, "SLT");
 		});
 
-		it("initialBalance - starts with a small balance for deployer", async () => {
+		it("has variable initialBalance - starts with a small balance for deployer", async () => {
 			const balanceInWei = await erc20.balanceOf.call(owner);
 			const balance = await web3.utils.fromWei(balanceInWei.toString(), "ether");
 			assert.equal(balance, 100);
@@ -43,7 +43,7 @@ contract("ERC20", accounts => {
 	describe("Contract functions", () => {
 		beforeEach(deploy);
 
-		it("transfer - user can transfer tokens", async () => {
+		it("has function transfer - user can transfer tokens", async () => {
 			// grab the tokens in wei first
 			const tokensInWei = await web3.utils.toWei('10');
 			// owner will transfer 10 tokens to user1
@@ -56,7 +56,7 @@ contract("ERC20", accounts => {
 			assert.equal(balanceOfUser1, 10);
 		});
 
-		it("transfer - a user cannot transfer tokens they don't have", async () => {
+		it("has function transfer - a user cannot transfer tokens they don't have", async () => {
 			try {
 				// grab the tokens in wei first
 				const tokensInWei = await web3.utils.toWei('10');
@@ -69,7 +69,7 @@ contract("ERC20", accounts => {
 			}
 		});
 
-		it("transferFrom - a user can set an allowance for another address", async () => {
+		it("has function transferFrom - a user can set an allowance for another address", async () => {
 			// grab the tokens in wei first
 			const tokensInWei = await web3.utils.toWei('10');
 			// owner will approve user1 to spend 10 tokens on their behalf
@@ -84,7 +84,7 @@ contract("ERC20", accounts => {
 			assert.equal(balanceOfUser2, 10);
 		});
 
-		it("transferFrom - an unapproved user cannot transfer another's tokens", async () => {
+		it("has function transferFrom - an unapproved user cannot transfer another's tokens", async () => {
 			try {
 				// grab the tokens in wei first
 				const tokensInWei = await web3.utils.toWei('10');
@@ -97,7 +97,7 @@ contract("ERC20", accounts => {
 			}
 		});
 
-		it("burn - a user can destroy their tokens", async () => {
+		it("has function burn - a user can destroy their tokens", async () => {
 			// grab the tokens in wei first
 			const tokensInWei = await web3.utils.toWei('10');
 			// grab the totalSupply
@@ -110,7 +110,7 @@ contract("ERC20", accounts => {
 			assert.equal(totalSupply - tokensInWei, newTotalSupply);
 		});
 
-		it("burn - a user cannot destroy tokens if they don't have any", async () => {
+		it("has function burn - a user cannot destroy tokens if they don't have any", async () => {
 			try {
 				// grab the tokens in wei first
 				const tokensInWei = await web3.utils.toWei('10');
@@ -123,7 +123,7 @@ contract("ERC20", accounts => {
 			}
 		});
 
-		it("burnFrom - a user can be approved to burn another address' tokens", async () => {
+		it("has function burnFrom - a user can be approved to burn another address' tokens", async () => {
 			// grab the tokens in wei first
 			const tokensInWei = await web3.utils.toWei('10');
 			// grab the totalSupply
@@ -138,7 +138,7 @@ contract("ERC20", accounts => {
 			assert.equal(totalSupply - tokensInWei, newTotalSupply);
 		});
 
-		it("burnFrom - an unapproved user cannot destroy another's tokens", async () => {
+		it("has function burnFrom - an unapproved user cannot destroy another's tokens", async () => {
 			try {
 				// grab the tokens in wei first
 				const tokensInWei = await web3.utils.toWei('10');

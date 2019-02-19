@@ -1,15 +1,19 @@
 pragma solidity ^0.5.0;
 
 import './ERC20.sol';
+import './Owned.sol';
 
 /**
  * A token for using the slot machines, SlotToken
  */
-contract SlotToken is ERC20 {
+contract SlotToken is ERC20, Owned {
 
 	/* -------------- Contract variables --------------*/
-    uint256 public sellPrice;
-    uint256 public buyPrice;
+    uint256 public sellPrice = (10**uint(18)) / 1000;
+    uint256 public buyPrice = (10**uint(18)) / 1000;
+
+    /* -------------- Contract Events --------------*/
+    event Minted(address indexed to, uint256 value);
 
     /* -------------- Constructor function --------------*/
     constructor (string memory tokenName, string memory tokenSymbol)
@@ -36,19 +40,19 @@ contract SlotToken is ERC20 {
      * @param _sellPrice Price the users can sell to the contract
      * @param _buyPrice Price users can buy from the contract
     */
-    // function setPrices(uint256 _sellPrice, uint256 _buyPrice) onlyOwner public {
-    //     sellPrice = _sellPrice;
-    //     buyPrice = _buyPrice;
-    // }
+    function setPrices(uint256 _sellPrice, uint256 _buyPrice) onlyOwner public {
+        sellPrice = _sellPrice;
+        buyPrice = _buyPrice;
+    }
 
     /* User can buy tokens from contract
      *
      * @notice Buy tokens from contract by sending ether
     */
     function buy() public payable returns (uint amount) {
-        // Amount is number of tokens they can buy
         amount = msg.value / buyPrice;
-        _transfer(address(this), msg.sender, amount);
+        mintToken(msg.sender, amount);
+        emit Minted(msg.sender, amount);
     }
 
     /* Users can sell tokens to contract
@@ -57,12 +61,13 @@ contract SlotToken is ERC20 {
      * @param _amount is amount of tokens to be sold
     */
     function sell(uint _amount) public returns (uint revenue) {
-        require(
-        	address(this).balance >= _amount * sellPrice,
-        	"the contract needs to have enough ether to buy the SLT tokens"
-        );
-        _transfer(msg.sender, address(this), _amount);
+    	require(
+    		balanceOf[msg.sender] >= _amount,
+    		"the sender needs to have as many tokens as they want to sell"
+    	);
+    	revenue = _amount * sellPrice;
+    	burn(_amount);
         msg.sender.transfer(revenue);
-        emit Transfer(msg.sender, address(this), _amount);
+        emit Burn(address(this), _amount);
     }
 }
