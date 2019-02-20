@@ -9,8 +9,8 @@ import './Owned.sol';
 contract SlotToken is ERC20, Owned {
 
 	/* -------------- Contract variables --------------*/
-    uint256 public sellPrice = (10**uint(18)) / 1000;
-    uint256 public buyPrice = (10**uint(18)) / 1000;
+    uint256 public sellPrice = 1 finney;
+    uint256 public buyPrice = 1 finney;
 
     /* -------------- Contract Events --------------*/
     event Minted(address indexed to, uint256 value);
@@ -31,7 +31,7 @@ contract SlotToken is ERC20, Owned {
     function mintToken (address _target, uint256 _amount) internal {
         balanceOf[_target] += _amount;
         totalSupply += _amount;
-        emit Transfer(address(0), address(this), _amount);
+        emit Minted(_target, _amount);
     }
 
     /* Set prices for new tokens
@@ -49,10 +49,9 @@ contract SlotToken is ERC20, Owned {
      *
      * @notice Buy tokens from contract by sending ether
     */
-    function buy() public payable returns (uint amount) {
-        amount = msg.value / buyPrice;
+    function buy() public payable {
+        uint amount = (msg.value / buyPrice) * uint(10**18); 
         mintToken(msg.sender, amount);
-        emit Minted(msg.sender, amount);
     }
 
     /* Users can sell tokens to contract
@@ -66,6 +65,7 @@ contract SlotToken is ERC20, Owned {
     		"the sender needs to have as many tokens as they want to sell"
     	);
     	revenue = _amount * sellPrice;
+        _transfer(msg.sender, address(this), _amount);
     	burn(_amount);
         msg.sender.transfer(revenue);
         emit Burn(address(this), _amount);
